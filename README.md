@@ -80,7 +80,7 @@ Agents live in `~/.claude/agents/` and the rules in `~/.claude/CLAUDE.md`, so
 the whole team is available in **every project** on your machine:
 
 ```bash
-git clone https://github.com/YOUR_ORG/claude-dev-team.git
+git clone https://github.com/ironmindai/claude-dev-team.git
 cd claude-dev-team
 
 # 1. Agents
