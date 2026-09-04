@@ -1,0 +1,53 @@
+<!-- ═══════════════════════════════════════════════════════════════════
+CLAUDE.md TEMPLATE — Claude Dev Team pack
+Copy this content into:
+  ~/.claude/CLAUDE.md          → user-level (recommended, applies to all projects)
+  <project>/CLAUDE.md          → project-level (single-project trial)
+If you already have a CLAUDE.md, MERGE these sections into it — do not overwrite.
+Fill in the "About Us" section, then delete this comment block.
+═══════════════════════════════════════════════════════════════════ -->
+
+## About Us
+<!-- Describe your team/company in 2-3 lines. Agents write better code and copy
+when they know who they're working for. Example: -->
+We are the engineering team at **{{YOUR_COMPANY}}**. Code quality, writing, and decisions should reflect a professional engineering team.
+
+## Agent Usage
+- Make sure to spawn the correct agent for the task
+- **NO SUBAGENT-TO-SUBAGENT SPAWNING, EVER.** Only the top-level orchestrator (the main conversation with the user) may spawn agents — this is enforced at the tool level (no specialist agent's `tools:` list includes the Agent/Task tool), so it cannot happen by accident. If you ARE a specialist subagent and hit a task outside your own scope/tool access, do not attempt to spawn anything — you can't — just stop and clearly report back to the orchestrator exactly what out-of-scope step is needed and why, so the orchestrator can spawn the right agent next.
+- **Orchestrator: avoid redundant re-spawns.** Because subagents can't call each other, they'll sometimes report back "I still need X" (e.g. venv setup, port allocation) more than once across a multi-step task — don't treat every such report as a fresh request. Before re-spawning system-devops-admin (or any agent) for something that sounds routine, check whether it was already handled earlier in this same conversation (e.g. check `docs/system-devops-admin.md`, check if `venv/` already exists) rather than spawning again on reflex. A flat call tree only stays easy to audit if the orchestrator also avoids duplicate round-trips.
+- When request involves BACKEND coding (python, node, go, etc.): use **backend-coder**
+- When request involves UI (HTML/CSS/JS/templates/components): use **frontend-brand-guardian**
+- For backend routes always use **backend-coder**
+- After backend + frontend work on the same feature: run **frontend-backend-sync-reviewer** to verify the API contract matches on both sides
+- For scheduled tasks, crons, workers: always spawn **scheduled-tasks-coder**
+- For any database schema change (tables, columns, constraints, indexes, migrations): use **database-schema-manager**
+- For system-level work (packages, nginx, SSL, ports, systemd, sudo): use **system-devops-admin**
+- For designing/modifying multi-step LLM pipelines: use **llm-workflow-architect**
+- For exploring HTTP/API surfaces of web apps (HEADLESS ONLY): use **headless-http-explorer**
+- For visual UI debugging with a real browser (optional agent, needs setup): use **ui-browser-debugger**
+- When spawning parallel agents, if they need to know each other's business, pre-generate that and send it to both for full sync. Example: when building a new endpoint, decide the route path + payload shape up front and include it in BOTH the backend-coder and frontend-brand-guardian prompts.
+
+## Knowledge Base
+- **Main Index**: See `~/.claude/kb-index.md` for all available knowledge base articles
+- Check kb-index.md first when working with: APIs, integrations, infrastructure, or development tools
+
+## Project Documentation
+- Agents maintain their own documentation independently — avoid creating documentation with the general-purpose agent unless directly asked by the user. Never assume documentation is needed; let agents do their thing.
+- docs/ folder is worth checking at the start of any task
+- Devops information: docs/system-devops-admin.md
+- Backend routes: docs/backend-routes.md (backend-coder maintains this)
+- Scheduled tasks: docs/scheduled-tasks.md (scheduled-tasks-coder maintains this)
+- Database schema: docs/database-schema-manager.md (database-schema-manager maintains this)
+- Brand guidelines: docs/brandbook.md (frontend-brand-guardian maintains this)
+- LLM pipelines: docs/workflows.md (llm-workflow-architect maintains this)
+- HTTP/API surface maps: docs/headless-http.md (headless-http-explorer maintains this)
+
+## Development Practices
+- **Verify against the authoritative source, not a rendered view or a generic probe.** When confirming a change is actually live/working, diff the served output against the file on disk (hash/byte comparison), not just a screenshot or page reload — template caches, stale worker processes, and browser caching can all make a correct change look like it didn't take. Same for permission checks: test the EXACT command that will actually run, not a generic stand-in.
+- Prefer CURL over test scripts when possible; archive test scripts after use
+- Python projects need an isolated venv so apps don't clash on a shared server. This is the orchestrator's job to arrange (subagents never spawn devops themselves): before/alongside any Python work, check whether `venv/` already exists in the project; only spawn system-devops-admin for venv setup if it doesn't. Never re-spawn devops for a venv that's already provisioned.
+- For flask/fastAPI or express: port allocation is the orchestrator's job via system-devops-admin, decided once per project up front — never decided ad hoc by a coding subagent, and never re-requested once a port is already assigned (check docs/system-devops-admin.md first).
+- Documentation: NEVER create documentation files on your own (agents handle this), unless the user specifically requests it
+- Scripts: temporary/debug/analysis/test scripts go in playground/ in the project root (create if not existing)
+- Console logs: ask devops to use journalctl for viewing, filtering, or monitoring
