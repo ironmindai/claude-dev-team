@@ -68,6 +68,12 @@ For project-level installs, skip this step and remove the
 `## Knowledge Base` section from the project CLAUDE.md (it references
 user-level paths).
 
+## Step 4b — Status line (optional, ask the user first)
+
+A custom two-line status line (context bar, git branch, plan usage). Offer it;
+if the user says yes, follow [`statusline/README.md`](statusline/README.md)
+exactly — it covers requirements, conflict handling, installation and verification.
+
 ## Step 5 — Verify
 
 1. `ls ~/.claude/agents/` (or the project equivalent) — 8 files present

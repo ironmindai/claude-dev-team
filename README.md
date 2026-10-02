@@ -27,7 +27,8 @@ claude-dev-team/
 │   └── optional/
 │       └── ui-browser-debugger.md   (needs a browser automation setup)
 ├── docs-scaffold/           ← explains the agent-maintained docs/ convention
-└── kb/                      ← knowledge-base skeleton (index + article template)
+├── kb/                      ← knowledge-base skeleton (index + article template)
+└── statusline/              ← optional custom status line (context bar, git, plan usage)
 ```
 
 ## The agents
